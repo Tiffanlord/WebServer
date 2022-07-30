@@ -16,14 +16,17 @@ WebServer::WebServer(
             port_(port), openLinger_(OptLinger), timeoutMS_(timeoutMS), isClose_(false),
             timer_(new HeapTimer()), threadpool_(new ThreadPool(threadNum)), epoller_(new Epoller())
     {
-    srcDir_ = getcwd(nullptr, 256);
+    srcDir_ = getcwd(nullptr, 256); // 获取当前的工作路径
     assert(srcDir_);
-    strncat(srcDir_, "/resources/", 16);
+    strncat(srcDir_, "/resources/", 16);    // 将 srcDir_ 和 "/resources/" 拼接起来->服务器资源路径
+    
     HttpConn::userCount = 0;
     HttpConn::srcDir = srcDir_;
     SqlConnPool::Instance()->Init("localhost", sqlPort, sqlUser, sqlPwd, dbName, connPoolNum);
 
+    // 初始化事件的模式
     InitEventMode_(trigMode);
+    // 初始化套接字
     if(!InitSocket_()) { isClose_ = true;}
 
     if(openLog) {
@@ -49,15 +52,16 @@ WebServer::~WebServer() {
     SqlConnPool::Instance()->ClosePool();
 }
 
+// 设置监听的文件描述符和通信的文件描述符的模式
 void WebServer::InitEventMode_(int trigMode) {
-    listenEvent_ = EPOLLRDHUP;
-    connEvent_ = EPOLLONESHOT | EPOLLRDHUP;
+    listenEvent_ = EPOLLRDHUP;  // EPOLLRDHUP 检测错误信息，能否正常断开
+    connEvent_ = EPOLLONESHOT | EPOLLRDHUP; // EPOLLONESHOT 
     switch (trigMode)
     {
     case 0:
         break;
     case 1:
-        connEvent_ |= EPOLLET;
+        connEvent_ |= EPOLLET;  // EPOLLET ET模式
         break;
     case 2:
         listenEvent_ |= EPOLLET;
@@ -71,7 +75,7 @@ void WebServer::InitEventMode_(int trigMode) {
         connEvent_ |= EPOLLET;
         break;
     }
-    HttpConn::isET = (connEvent_ & EPOLLET);
+    HttpConn::isET = (connEvent_ & EPOLLET);    // 是否是 ET模式，通过按位与操作判断
 }
 
 void WebServer::Start() {

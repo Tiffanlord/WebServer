@@ -29,7 +29,7 @@ public:
         int port, int trigMode, int timeoutMS, bool OptLinger, 
         int sqlPort, const char* sqlUser, const  char* sqlPwd, 
         const char* dbName, int connPoolNum, int threadNum,
-        bool openLog, int logLevel, int logQueSize);
+        bool openLog, int logLevel, int logQueSize); // 有参构造函数声明
 
     ~WebServer();
     void Start();
@@ -51,24 +51,24 @@ private:
     void OnWrite_(HttpConn* client);
     void OnProcess(HttpConn* client);
 
-    static const int MAX_FD = 65536;
+    static const int MAX_FD = 65536;    // 最大的文件描述符的个数
 
-    static int SetFdNonblock(int fd);
+    static int SetFdNonblock(int fd);   // 设置文件描述符非阻塞
 
-    int port_;
-    bool openLinger_;
-    int timeoutMS_;  /* 毫秒MS */
-    bool isClose_;
-    int listenFd_;
-    char* srcDir_;
+    int port_;          // 服务器端口
+    bool openLinger_;   // 是否打开优雅关闭
+    int timeoutMS_;     // 超时时间，毫秒MS
+    bool isClose_;      // 服务器是否关闭
+    int listenFd_;      // 监听的文件描述符
+    char* srcDir_;      // 资源的目录
     
-    uint32_t listenEvent_;
-    uint32_t connEvent_;
+    uint32_t listenEvent_;  // 监听的文件描述符的事件
+    uint32_t connEvent_;    // 连接的文件描述符的事件
    
-    std::unique_ptr<HeapTimer> timer_;
-    std::unique_ptr<ThreadPool> threadpool_;
-    std::unique_ptr<Epoller> epoller_;
-    std::unordered_map<int, HttpConn> users_;
+    std::unique_ptr<HeapTimer> timer_;          // 定时器
+    std::unique_ptr<ThreadPool> threadpool_;    // 线程池
+    std::unique_ptr<Epoller> epoller_;          // epoll 对象
+    std::unordered_map<int, HttpConn> users_;   // 保存的是客户端连接的信息，每连接一个客户端，创建一个 HttpConn 对象，保存在 map 里面
 };
 
 

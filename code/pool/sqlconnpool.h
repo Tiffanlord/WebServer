@@ -14,6 +14,7 @@
 #include <thread>
 #include "../log/log.h"
 
+// 定义类 数据库连接池
 class SqlConnPool {
 public:
     static SqlConnPool *Instance();

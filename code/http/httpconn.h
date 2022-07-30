@@ -52,8 +52,8 @@ public:
     }
 
     static bool isET;
-    static const char* srcDir;
-    static std::atomic<int> userCount;
+    static const char* srcDir;          // 资源的目录
+    static std::atomic<int> userCount;  // 总共的客户端的连接数
     
 private:
    
